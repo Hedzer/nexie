@@ -83,7 +83,7 @@ class WhenThough {
 		return this;
 	}
 
-	one(eventName: Key, listener: Function): this { 
+	once(eventName: Key, listener: Function): this { 
 		const proxy = (...data: any) => {
 			listener(...data);
 			this.removeListener(eventName, proxy);
