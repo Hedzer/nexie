@@ -22,7 +22,11 @@ const idGenerator = uid.generator();
 
 class WhenThough {
 
-	get(key: Key): Promise<any> {
+	get(key: Key): any {
+		return values.get(key);
+	}
+
+	request(key: Key): Promise<any> {
 		return this.getPromise(key);
 	}
 
@@ -33,6 +37,12 @@ class WhenThough {
 	}
 
 	set(key: Key, value: any): any {
+		if (values.has(key)) { return values.get(key); }
+
+		return this.upsert(key, value);
+	}
+
+	upsert(key: Key, value: any): any { 
 		if (values.get(key) === value) { return value; }
 
 		values.set(key, value);

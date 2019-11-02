@@ -4,7 +4,7 @@ import global from '../dist/index';
 
 test('deletion rejection after get', async t => {
 	const key = Symbol('TEST');
-	const promise = global.get(key);
+	const promise = global.request(key);
 	promise
 		.then(value => t.fail())
 		.catch(err => t.pass());
@@ -15,7 +15,7 @@ test('get after deletion rejection', async t => {
 	const key = Symbol('TEST');
 	global.set(key, 'PASSED');
 	global.delete(key);
-	const promise = global.get(key);
+	const promise = global.request(key);
 	promise
 		.then(value => t.fail())
 		.catch(err => t.fail(err));
@@ -28,7 +28,7 @@ test('clearing rejection after get', async t => {
 	await new Promise((res, rej) => {
 		setTimeout(() => {
 			const key = Symbol('TEST');
-			const promise = global.get(key);
+			const promise = global.request(key);
 			promise
 				.then(value => { t.fail(); res(); })
 				.catch(err => { t.pass(); res(); });
@@ -43,7 +43,7 @@ test('get after clearing rejection', async t => {
 			const key = Symbol('TEST');
 			global.set(key, 'PASSED');
 			global.clear();
-			const promise = global.get(key);
+			const promise = global.request(key);
 			promise
 				.then(value => { t.fail(); res(); })
 				.catch(err => { t.fail(); res(); });
