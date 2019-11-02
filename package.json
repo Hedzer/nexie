@@ -1,7 +1,7 @@
 {
   "name": "whenthough",
-  "version": "0.2.0",
-  "description": "An abstraction for passing around global objects and singletons that resolves via promises. Minimal, built using esnext, with no imports or shims. Inspired by global-cache.",
+  "version": "0.2.1",
+  "description": "An abstraction for passing around global objects and singletons with multi-paradigm resolution. Minimal, built using esnext, with no imports or shims. Inspired by global-cache.",
   "keywords": [
     "key value",
     "kv",
