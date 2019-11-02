@@ -1,0 +1,55 @@
+{
+  "name": "whenthough",
+  "version": "0.1.0",
+  "description": "An abstraction for passing around global objects and singletons that resolves via promises. Minimal, built using esnext, with no imports or shims. Inspired by global-cache.",
+  "keywords": [
+    "key value",
+    "kv",
+    "events",
+    "promise",
+    "esnext",
+    "es6",
+    "global-cache",
+    "global",
+    "window",
+    "self",
+    "cache",
+    "global object"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "prepublish": "tsc",
+  "dependencies": {
+    "yield-uid": "^0.1.0"
+  },
+  "devDependencies": {
+    "ava": "^2.3.0",
+    "typescript": "^3.6.2",
+    "tsc": "^1.20150623.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "ava"
+  },
+  "ava": {
+    "files": [
+      "./tests/*.js"
+    ],
+    "require": [
+      "esm"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hedzer/whenthough.git"
+  },
+  "author": "Hedzer Ferwerda",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Hedzer/whenthough/issues"
+  },
+  "homepage": "https://github.com/Hedzer/whenthough#readme"
+}
