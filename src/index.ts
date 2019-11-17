@@ -162,7 +162,7 @@ class WhenThough {
 	}
 }
 
-const global = (anySymbol[globalKey] = anySymbol[globalKey] || new WhenThough());
+const global: WhenThough = (anySymbol[globalKey] = anySymbol[globalKey] || new WhenThough());
 
 export { Key };
 export { PromiseMaybe };
