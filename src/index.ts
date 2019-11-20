@@ -4,26 +4,49 @@ type Key = string | symbol;
 type PromiseMaybe = Promise<any> | undefined;
 enum RejectionReason { DELETED = 'DELETED', CLEARED = 'CLEARED' };
 
-const globalKey = Symbol.for('@whenthough/global');
-const promisesKey = Symbol.for('@whenthough/promises');
-const valuesKey = Symbol.for('@whenthough/values');
-const resolved = Symbol.for('@whenthough/resolved');
-const rejected = Symbol.for('@whenthough/rejected');
-const resolve = Symbol.for('@whenthough/resolve');
-const reject = Symbol.for('@whenthough/reject');
-const finished = Symbol.for('@whenthough/finished');
-const functionId = Symbol.for('@whenthough/functionId');
+const defaultNamespace: string = 'global';
+const root: string = '@whenthough';
+const defaultGlobalKey = Symbol.for(`${root}/${defaultNamespace}`);
 const anySymbol = <any>Symbol;
 
-const promises: Map<Key, Promise<any>> = anySymbol[promisesKey] || new Map<Key, Promise<any>>();
-const values: Map<Key, any> = anySymbol[valuesKey] || new Map<Key, any>();
-const events: Map<Key, Map<Symbol, Function>> = new Map<Key, Map<Symbol, Function>>();
-const idGenerator = uid.generator();
-
 class WhenThough {
+	private globalKey: symbol;
+	private promisesKey: symbol;
+	private valuesKey: symbol;
+	private resolvedKey: symbol;
+	private rejectedKey: symbol;
+	private resolveKey: symbol;
+	private rejectKey: symbol;
+	private finishedKey: symbol;
+	private functionId: symbol;
+	
+	private promises: Map<Key, Promise<any>>;
+	private values: Map<Key, any>;
+	private events: Map<Key, Map<Symbol, Function>>;
+	private idGenerator: IterableIterator<string>;
+
+	constructor(namespace: string = defaultNamespace) {
+		this.globalKey = Symbol.for(`${root}/${namespace}`);
+		this.promisesKey = Symbol.for(`${root}/${namespace}/promises`);
+		this.valuesKey = Symbol.for(`${root}/${namespace}/values`);
+		this.resolvedKey = Symbol.for(`${root}/${namespace}/resolved`);
+		this.rejectedKey = Symbol.for(`${root}/${namespace}/rejected`);
+		this.resolveKey = Symbol.for(`${root}/${namespace}/resolve`);
+		this.rejectKey = Symbol.for(`${root}/${namespace}/reject`);
+		this.finishedKey = Symbol.for(`${root}/${namespace}/finished`);
+		this.functionId = Symbol.for(`${root}/${namespace}/functionId`);
+
+		this.promises = anySymbol[this.promisesKey] || new Map<Key, Promise<any>>();
+		this.values = anySymbol[this.valuesKey] || new Map<Key, any>();
+		this.events = new Map<Key, Map<Symbol, Function>>();
+		this.idGenerator = uid.generator();
+		this.key = this.globalKey;
+	}
+
+	public readonly key: symbol;
 
 	get(key: Key): any {
-		return values.get(key);
+		return this.values.get(key);
 	}
 
 	request(key: Key): Promise<any> {
@@ -37,18 +60,18 @@ class WhenThough {
 	}
 
 	set(key: Key, value: any): any {
-		if (values.has(key)) { return values.get(key); }
+		if (this.values.has(key)) { return this.values.get(key); }
 
 		return this.upsert(key, value);
 	}
 
 	upsert(key: Key, value: any): any { 
-		if (values.get(key) === value) { return value; }
+		if (this.values.get(key) === value) { return value; }
 
-		values.set(key, value);
+		this.values.set(key, value);
 		let promise = this.getPromise(key);
 		if (this.isFinished(promise)) {
-			promises.delete(key);
+			this.promises.delete(key);
 			promise = this.getPromise(key);
 		}
 		this.resolve(promise, value);
@@ -57,28 +80,28 @@ class WhenThough {
 	}
 
 	has(key: Key): boolean {
-		return values.has(key);
+		return this.values.has(key);
 	}
 
 	delete(key: Key) {
-		const promise = promises.get(key);
-		values.delete(key);
-		promises.delete(key);
+		const promise = this.promises.get(key);
+		this.values.delete(key);
+		this.promises.delete(key);
 		this.reject(promise, RejectionReason.DELETED);
 	}
 
 	clear() {
-		promises.forEach(promise => this.reject(promise, RejectionReason.CLEARED));
-		promises.clear();
-		values.clear();
+		this.promises.forEach(promise => this.reject(promise, RejectionReason.CLEARED));
+		this.promises.clear();
+		this.values.clear();
 	}
 
 	on(eventName: Key, listener: Function): this {
-		if (!events.has(eventName)) { events.set(eventName, new Map<Symbol, Function>()); }
+		if (!this.events.has(eventName)) { this.events.set(eventName, new Map<Symbol, Function>()); }
 		const event = this.getEvents(eventName);
 		let fn = <any>listener;
-		let id = fn[functionId] || idGenerator.next().value;
-		fn[functionId] = id;
+		let id = fn[this.functionId] || this.idGenerator.next().value;
+		fn[this.functionId] = id;
 		event.set(id, listener);
 		return this;
 	}
@@ -90,16 +113,16 @@ class WhenThough {
 		};
 		
 		this.on(eventName, proxy);
-		(<any>listener)[functionId] = (<any>proxy)[functionId];
+		(<any>listener)[this.functionId] = (<any>proxy)[this.functionId];
 		return this;
 	}
 
 	eventNames() {
-		return [ ...events.keys() ];
+		return [ ...this.events.keys() ];
 	}
 
 	emit(eventName: Key, ...data: any): this {
-		if (!events.has(eventName)) { return this; }
+		if (!this.events.has(eventName)) { return this; }
 
 		this.getEvents(eventName).forEach(fn => fn(...data))
 		return this;
@@ -107,18 +130,18 @@ class WhenThough {
 
 	removeListener(eventName: Key, listener: Function): this {
 		let fn = <any>listener;
-		if (!fn[functionId] || !events.has(eventName)) { return this; }
+		if (!fn[this.functionId] || !this.events.has(eventName)) { return this; }
 		
-		this.getEvents(eventName).delete(fn[functionId]);
+		this.getEvents(eventName).delete(fn[this.functionId]);
 		return this;
 	}
 
 	private getEvents(eventName: Key): Map<Symbol, Function> {
-		return (<Map<Symbol, Function>>events.get(eventName));
+		return (<Map<Symbol, Function>>this.events.get(eventName));
 	}
 	private getPromise(key: Key): Promise<any> {
 		this.ensurePromise(key);
-		return (<Promise<any>>promises.get(key));
+		return (<Promise<any>>this.promises.get(key));
 	}
 	private createPromise(): Promise<any> {
 		const proxy: any = { };
@@ -126,43 +149,43 @@ class WhenThough {
 			proxy.reject = rej;
 			proxy.resolve = res;
 		});
-		(<any>promise)[resolve] = proxy.resolve;
-		(<any>promise)[reject] = proxy.reject;
+		(<any>promise)[this.resolveKey] = proxy.resolve;
+		(<any>promise)[this.rejectKey] = proxy.reject;
 
 		promise
 			.then(() => {
-				(<any>promise)[resolved] = true;
-				(<any>promise)[finished] = true;
+				(<any>promise)[this.resolvedKey] = true;
+				(<any>promise)[this.finishedKey] = true;
 			})
 			.catch(() => {
-				(<any>promise)[rejected] = true;
-				(<any>promise)[finished] = true;
+				(<any>promise)[this.rejectedKey] = true;
+				(<any>promise)[this.finishedKey] = true;
 			});
 		return promise;
 	}
 	private ensurePromise(key: Key) {
-		if (!promises.has(key)) { promises.set(key, this.createPromise()); }
+		if (!this.promises.has(key)) { this.promises.set(key, this.createPromise()); }
 	}
 	private isFinished(promise: PromiseMaybe) {
-		return (<any>promise)[finished];
+		return (<any>promise)[this.finishedKey];
 	}
 	private resolve(promise: PromiseMaybe, value: any) {
 		if (!promise) { return; }
 
 		if (this.isFinished(promise)) { return; }
 
-		(<any>promise)[resolve](value);
+		(<any>promise)[this.resolveKey](value);
 	}
 	private reject(promise: PromiseMaybe, reason: RejectionReason) {
 		if (!promise) { return; }
 
 		if (this.isFinished(promise)) { return; }
 
-		(<any>promise)[reject](reason);
+		(<any>promise)[this.rejectKey](reason);
 	}
 }
 
-const global: WhenThough = (anySymbol[globalKey] = anySymbol[globalKey] || new WhenThough());
+const global: WhenThough = (anySymbol[defaultGlobalKey] = anySymbol[defaultGlobalKey] || new WhenThough());
 
 export { Key };
 export { PromiseMaybe };
