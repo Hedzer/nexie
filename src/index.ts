@@ -49,23 +49,23 @@ class WhenThough {
 		return this.values.get(key);
 	}
 
-	request(key: Key): Promise<any> {
+	request<T>(key: Key): Promise<T> {
 		return this.getPromise(key);
 	}
 
-	* pull(key: Key): Iterator<Promise<any>> {
+	* pull<T>(key: Key): Iterator<Promise<T>> {
 		while (true) {
 			yield this.getPromise(key);
 		}
 	}
 
-	set(key: Key, value: any): any {
+	set<T>(key: Key, value: T): T {
 		if (this.values.has(key)) { return this.values.get(key); }
 
 		return this.upsert(key, value);
 	}
 
-	upsert(key: Key, value: any): any { 
+	upsert<T>(key: Key, value: T): T { 
 		if (this.values.get(key) === value) { return value; }
 
 		this.values.set(key, value);
@@ -191,5 +191,6 @@ export { Key };
 export { PromiseMaybe };
 export { RejectionReason };
 export { WhenThough };
+export { global as Global };
 
 export default global;

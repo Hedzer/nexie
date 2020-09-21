@@ -1,6 +1,6 @@
 {
   "name": "whenthough",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "An abstraction for passing around global objects and singletons with multi-paradigm resolution. Minimal, built using esnext, with no imports or shims. Inspired by global-cache.",
   "keywords": [
     "key value",
@@ -23,12 +23,13 @@
   ],
   "prepublish": "tsc",
   "dependencies": {
+    "esm": "^3.2.25",
     "yield-uid": "^0.1.0"
   },
   "devDependencies": {
-    "ava": "^2.3.0",
-    "typescript": "^3.6.2",
-    "tsc": "^1.20150623.0"
+    "ava": "^3.12.1",
+    "tsc": "^1.20150623.0",
+    "typescript": "^3.6.2"
   },
   "scripts": {
     "build": "tsc",
