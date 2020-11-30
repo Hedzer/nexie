@@ -1,5 +1,3 @@
-
-import test from 'ava';
 import global from '../dist/index';
 
 test('undefined get', async t => {
@@ -29,9 +27,7 @@ test('set, upsert then get', async t => {
 test('set after request', async t => {
 	const key = Symbol('TEST');
 	const promise = global.request(key);
-	promise
-		.then(value => t.is(value, 'PASSED'))
-		.catch(err => t.fail());
+	promise.then(value => t.is(value, 'PASSED')).catch(err => t.fail());
 	global.set(key, 'PASSED');
 });
 
@@ -39,7 +35,5 @@ test('request after set', async t => {
 	const key = Symbol('TEST');
 	global.set(key, 'PASSED');
 	const promise = global.request(key);
-	promise
-		.then(value => t.is(value, 'PASSED'))
-		.catch(err => t.fail());
+	promise.then(value => t.is(value, 'PASSED')).catch(err => t.fail());
 });

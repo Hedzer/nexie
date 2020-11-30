@@ -1,14 +1,14 @@
 
 
-## WhenThough (Window)
+## Nexie
 
 ### What is it?
 
-`whenthough` is meant to substitute and abstract the use of `window` or `global`. It offers multiple resolution paradigms, such as resolving through promises, yielded generator values, or by event emission. `whenthough` is built using ES6 technologies, includes no shims or polyfills, and is less than 1kb minified and gzipped. 
+`nexie` is meant to substitute and abstract the use of `window` or `global`. It offers multiple resolution paradigms, such as resolving through promises, yielded generator values, or by event emission. `nexie` is built using es6, includes no shims or polyfills, and is less than 1kb minified and gzipped. 
 
 ### Installation
 ```
-npm install --save whenthough
+npm install --save nexie
 ``` 
 ### Key-Value Sync Usage
 ```javascript
@@ -16,7 +16,7 @@ npm install --save whenthough
 global.set('acme-module', module); // must happen before importing module calls get
 
 // ----------- Importing Module -------------
-import global from 'whenthough';
+import global from 'nexie';
 const acme = global.get('acme-module'); // returns what the value at this point in time
 // use acme module here
 ```
@@ -25,7 +25,7 @@ const acme = global.get('acme-module'); // returns what the value at this point 
 ### Key-Value Promise Usage
 ```javascript
 // ----------- Importing Module -------------
-import global from 'whenthough';
+import global from 'nexie';
 const acme = await global.request('acme-module'); // returns a promise
 // use acme module here
 
@@ -35,7 +35,7 @@ global.set('acme-module', module); // previous await is resolved
 ### Event Usage
 ```javascript
 // ----------- Importing Module -------------
-import global from 'whenthough';
+import global from 'nexie';
 global.on('acme-module', (acme) => {
 	// use acme module here
 });
@@ -48,7 +48,7 @@ global.set('acme-module', module); // previous event is triggered
 ### Generator Usage
 ```javascript
 // ----------- Importing Module -------------
-import global from 'whenthough';
+import global from 'nexie';
 const generator = global.pull('acme-module');
 const acme = await generator.next().value; // generates a promise
 // use acme module here

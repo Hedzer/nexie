@@ -1,14 +1,24 @@
 {
-  "name": "whenthough",
-  "version": "0.4.0",
+  "name": "nexie",
+  "version": "0.2.2",
   "description": "An abstraction for passing around global objects and singletons with multi-paradigm resolution. Minimal, built using esnext, with no imports or shims. Inspired by global-cache.",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
   "keywords": [
     "key value",
     "kv",
+    "bus",
+    "event bus",
     "events",
     "promise",
-    "esnext",
-    "es6",
     "global-cache",
     "global",
     "window",
@@ -16,41 +26,51 @@
     "cache",
     "global object"
   ],
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "/dist"
-  ],
-  "prepublish": "tsc",
-  "dependencies": {
-    "esm": "^3.2.25",
-    "yield-uid": "^0.1.0"
-  },
-  "devDependencies": {
-    "ava": "^3.12.1",
-    "tsc": "^1.20150623.0",
-    "typescript": "^3.6.2"
-  },
   "scripts": {
-    "build": "tsc",
-    "test": "ava"
+    "start": "tsdx watch",
+    "build": "tsdx build --name Nexie --format cjs,esm,umd --target node",
+    "test": "tsdx test",
+    "lint": "tsdx lint src",
+    "prepare": "tsdx build --name Nexie --format cjs,esm,umd --target node",
+    "size": "size-limit",
+    "analyze": "size-limit --why"
   },
-  "ava": {
-    "files": [
-      "./tests/*.js"
-    ],
-    "require": [
-      "esm"
-    ]
+  "peerDependencies": {},
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Hedzer/whenthough.git"
+  "prettier": {
+    "useTabs": true,
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
   },
-  "author": "Hedzer Ferwerda",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Hedzer/whenthough/issues"
+  "author": "Hedzer",
+  "module": "dist/nexie.esm.js",
+  "size-limit": [
+    {
+      "path": "dist/nexie.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/nexie.esm.js",
+      "limit": "10 KB"
+    }
+  ],
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^4.7.0",
+    "husky": "^4.3.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "size-limit": "^4.7.0",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.0.3",
+    "typescript": "^4.0.5"
   },
-  "homepage": "https://github.com/Hedzer/whenthough#readme"
+  "dependencies": {
+    "yuid": "^0.2.1"
+  }
 }
