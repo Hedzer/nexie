@@ -3,14 +3,14 @@ import global from '../src/index';
 it('trigger events if set occurs after a listener is added', async () => {
 	let result = 'FAILED';
 	const key = Symbol('TEST');
-	global.on(key, (value: string) => result = value);
+	global.on(key, (value: string) => (result = value));
 	global.set(key, 'PASSED');
 	const finished = new Promise((res, rej) => {
 		setTimeout(async () => {
 			try {
 				expect(global.request(key)).resolves.toBe('PASSED');
 				expect(result).toBe('PASSED');
-				res();				
+				res();
 			} catch (error) {
 				rej(error);
 			}
@@ -26,7 +26,7 @@ it('should not trigger events listened to after set', async () => {
 	const finished = new Promise((res, rej) => {
 		setTimeout(async () => {
 			try {
-				expect(await global.request(key)).toBe('PASSED');	
+				expect(await global.request(key)).toBe('PASSED');
 			} catch (error) {
 				rej(error);
 			}
